@@ -39,7 +39,7 @@ func PreviewMode()
 	SetCategory(C4D_StaticBack);
 	SetClrModulation(RGBa(255, 255, 255, 128));
 	this.Visibility = VIS_Owner;
-	AddEffect("Preview", this, 1, 1, this);
+	AddEffect("Preview", this, 1, 3, this);
 }
 
 func FxPreviewTimer()
