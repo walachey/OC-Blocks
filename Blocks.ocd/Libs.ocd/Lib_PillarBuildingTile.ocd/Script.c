@@ -25,7 +25,7 @@ func Constructed()
 
 func BuildingCondition()
 {
-	if (FindObject(Find_Not(Find_Func("IsPreview")), Find_AtPoint(), Find_Not(Find_Func("IsWallBuildingTile")), Find_Func("IsBuildingTile"), Find_Exclude(this)))
+	if (FindObject(Find_Not(Find_Func("IsPreview")), Find_AtPoint(), Find_Func("IsPillarBuildingTile"), Find_Exclude(this)))
 		return false;
 
 	if (VerticesStuckSemi() == GetVertexNum()+1)
