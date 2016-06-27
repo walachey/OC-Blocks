@@ -131,6 +131,11 @@ private func GetNeighbours(bool ignore_cycles)
 	return blocks;
 }
 
+private func IsNeighbour(object other)
+{
+	return other->GetID() == GetID() && ObjectDistance(other) <= Distance(0, 0, build_grid_x, build_grid_y);
+}
+
 private func CheckObjects()
 {
 	var rect = Find_AtRect(-build_grid_x / 2, -build_grid_y / 2, build_grid_x, build_grid_y * 4);

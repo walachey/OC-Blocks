@@ -28,10 +28,7 @@ public func Destruction()
 
 static const ConveyorPathOps = new AStarOps
 {
-	distance = func(object start, object goal)
-	{
-		return Abs(start->GetX() - goal->GetX()) + Abs(start->GetY() - goal->GetY());
-	},
+	distance = ObjectDistance,
 
 	successors = func(object node)
 	{
@@ -39,8 +36,26 @@ static const ConveyorPathOps = new AStarOps
 	}
 };
 
+static const ConveyorDiscoveryOps = new ConveyorPathOps
+{
+	// overwrite these
+	from = nil, payload = nil,
+
+	// Goal is only used for the heuristic.
+	goal_equal = func(object node, goal)
+	{
+		return node->IsTarget(from, payload);
+	},
+
+};
+
 local MoveEffect = new Effect
 {
+	Construction = func()
+	{
+		this.pos = 0;
+	},
+
 	Timer = func()
 	{
 		if (!this.final_target) return FX_Execute_Kill;
@@ -50,10 +65,20 @@ local MoveEffect = new Effect
 		
 		if (!this.current_target)
 		{
-			// TODO: Don't search for a new path at each step.
-			var path = AStar(this.current_block, this.final_target, ConveyorPathOps);
-			if (path) this.current_target = path[1];
-			if (!this.current_target) return FX_Execute_Kill;
+			// Move on in the pre-calculated path.
+			this.current_target = this.path[this.pos++];
+			if (!this.current_target || !this.current_target->IsNeighbour(this.current_block))
+			{
+				// Recalculate a new path to the final target.
+				this.path = AStar(this.current_block, this.final_target, ConveyorPathOps);
+				if (this.path)
+				{
+					this.current_target = this.path[1];
+					this.pos = 2;
+				}
+				else
+					return FX_Execute_Kill;
+			}
 		}
 		var target_x = this.current_target->GetX();
 		var target_y = this.current_target->GetY();
@@ -84,8 +109,8 @@ public func StartMoving(object payload)
 {
 	if (!payload || !home_block) return;
 	
-	var target_block = DiscoverTarget(home_block, payload);
-	if (!target_block)
+	var path = DiscoverTarget(home_block, payload);
+	if (!path)
 	{
 		ScheduleCall(this, "StartMoving", 30, nil, payload);
 		return;
@@ -95,33 +120,18 @@ public func StartMoving(object payload)
 		this.line->RemoveObject();
 	
 	var fx = CreateEffect(MoveEffect, 1, 1);
-	fx.final_target = target_block;
+	fx.path = path;
+	fx.final_target = path[GetLength(path) - 1];
 	fx.current_block = home_block;
 }
 
 private func DiscoverTarget(object from, object payload)
 {
-	from.already_found = true;
-	var blocks = [from];
-	var target = nil;
-	for (var i = 0; i < GetLength(blocks); ++i)
-	{
-		if (target) break;
-		var block = blocks[i];
-		for (var neighbour in block->GetNeighbours(true))
-		{
-			neighbour.already_found = true;
-			PushBack(blocks, neighbour);
-			
-			if (neighbour->IsTarget(from, payload))
-			{
-				target = neighbour;
-				break;
-			}
-		}
-	}
-	
-	for (var block in blocks)
-		block.already_found = false;
-	return target;
+	// Use the closest lorry as pathfinding heuristic.
+	// TODO: Maybe filter lorries with a conveyor above?
+	var goal_candidate = FindObject(Find_ID(Lorry), Sort_Distance());
+	if (!goal_candidate) return;
+	var path = AStar(from, goal_candidate, new ConveyorDiscoveryOps { from = from, payload = payload });
+
+	return path;
 }
