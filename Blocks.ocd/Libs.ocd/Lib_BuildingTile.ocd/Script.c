@@ -49,6 +49,7 @@ func OnHitByPickaxe()
 
 func PreviewBuildingCondition(callers)
 {
+
 	if (BuildingCondition())
 		return true;
 	

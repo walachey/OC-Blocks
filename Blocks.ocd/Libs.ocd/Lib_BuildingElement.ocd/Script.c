@@ -39,7 +39,7 @@ func PreviewMode()
 	SetCategory(C4D_StaticBack);
 	SetClrModulation(RGBa(255, 255, 255, 128));
 	this.Visibility = VIS_Owner;
-	AddEffect("Preview", this, 1, 1, this);
+	AddEffect("Preview", this, 1, 2, this);
 }
 
 func FxPreviewTimer()
@@ -72,19 +72,30 @@ public func ControlUseHolding(object clonk, int x, int y)
 		DrawPreviewLine(starting_point_x, starting_point_y, clonk->GetX() + x, clonk->GetY() + y);
 	else if (tile_mode == TILE_MODE_VERTICAL_LINE)
 		DrawPreviewLine(starting_point_x, starting_point_y, starting_point_x, clonk->GetY() + y);
+	/*else if (tile_mode == TILE_MODE_RECTANGLE)
+		DrawPreviewRect(starting_point_x, starting_point_y, clonk->GetX() + x, clonk->GetY() + y);*/
 	return true;
 }
 
 public func ControlUseStop(object clonk, int x, int y)
 {
-	for (var preview_object in preview_objects)
+	while (true)
 	{
-		if (!preview_object) continue;
-		if (!preview_object->BuildingCondition()) continue;
-		var obj = this->TakeObject();
-		obj->SetPosition(preview_object->GetX(), preview_object->GetY());
-		obj->Constructed();
-		obj.Collectible = 0;
+		var flag = false;
+	
+		for (var preview_object in preview_objects)
+		{
+			if (!preview_object) continue;
+			if (!preview_object->BuildingCondition()) continue;
+			var obj = this->TakeObject();
+			obj->SetPosition(preview_object->GetX(), preview_object->GetY());
+			obj->Constructed();
+			obj.Collectible = 0;
+			flag = true;
+		}
+		
+		if (!flag)
+			break;
 	}
 	
 	ClearPreviewObjects();
@@ -98,6 +109,52 @@ public func ControlUseCancel(object clonk, int x, int y)
 	AddEffect("RemovePreview", this, 1, 1, this);
 	return true;
 }
+
+/*private func DrawPreviewRect(int from_x, int from_y, int to_x, int to_y)
+{
+	ClearPreviewObjects();
+	
+	var len_x = to_x - from_x;
+	var len_y = to_y - from_y;
+	var xdir = 0;
+	var ydir = 0;
+
+	
+	xdir = BoundBy(len_x, -1, 1);
+	ydir = BoundBy(len_y, -1, 1);
+	
+	// Round up.
+	var blocksX = Abs(len_x) / build_grid_x + 1;
+	var blocksY = Abs(len_y) / build_grid_y;
+	
+	blocksX = BoundBy(blocksX, -10, 10);
+	blocksY = BoundBy(blocksY, -10, 10);
+	
+	var x = starting_point_x;
+	var y = starting_point_y;
+	for (var i = 0; i < blocksX; ++i)
+	{
+		var block;
+		block = CreatePreviewObject();
+		if (!block) continue;
+		
+		block->SetPosition(x, y);
+		
+		block = nil;
+		y = starting_point_y + ydir * build_grid_y;
+		for (var u = 0; u < blocksY; ++u)
+		{
+			block = CreatePreviewObject();
+			if (!block) continue;
+			
+			block->SetPosition(x, y);
+			y += ydir * build_grid_y;
+		}
+		y = starting_point_y;
+		x += xdir * build_grid_x;
+	}
+	
+}*/
 
 private func DrawPreviewLine(int from_x, int from_y, int to_x, int to_y)
 {

@@ -70,7 +70,6 @@ func BuildingCondition()
 
 	if (FindObject(Find_Exclude(this), Find_Func("IsBuildingTile"), Find_Not(Find_Func("IsPreview")),
 		Find_Or(Find_OnLine(-tile_size_x/2-1, 0, tile_size_x/2+1, 0), Find_OnLine(0, -tile_size_y/2-1, 0, tile_size_y/2+2))))
-		//Find_Or(Find_AtRect(-tile_size_x/2-1, -tile_size_y/2, tile_size_x+2, tile_size_y), Find_AtRect(-tile_size_x/2, -tile_size_y/2-1, tile_size_x, tile_size_y+2))))
 		return true;
 	
 	return false;
