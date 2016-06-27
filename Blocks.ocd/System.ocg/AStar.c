@@ -18,9 +18,25 @@ global func AsyncAStarMap(proplist start, proplist goal, int step, proplist opti
 }
 
 static const AStarOps = new Global {
-	distance = func(a, b) { FatalError("todo"); },
+	// Distance heuristic for selecting nodes. A good heuristic will speed up
+	// A*, a bad heuristic can lead to non-optimal paths.
+	distance = func(node, goal) { FatalError("todo"); },
+
+	// Cost between two neighboring nodes. You'll need a different
+	// implementation if your goal isn't a regular node.
 	cost = func() { return this->distance(...); },
+
+	// Returns an array of neighboring nodes.
 	successors = func(a) { FatalError("todo"); },
+
+	// Equality function for nodes. DeepEqual works well for for objects as
+	// well as state proplists, but you may be able to supply a more efficient
+	// implementation.
+	node_equal = DeepEqual,
+
+	// Goal identification. You'll need a different implementation if your goal
+	// isn't a regular node.
+	goal_equal = func(node, goal) { return this->node_equal(node, goal); },
 };
 
 static const _AStarMapOps = new AStarOps {
@@ -61,10 +77,10 @@ global func AStar(start, goal, proplist ops)
 	while (GetLength(state.open))
 	{
 		current = HeapExtract(state.open);
-		if (DeepEqual(current[2], goal))
+		if (ops->goal_equal(current[2], goal))
 		{
 			// Reconstruct the path.
-			var path = [goal];
+			var path = [current[2]];
 			while (current = current[3])
 				PushFront(path, current[2]);
 			return path;
@@ -97,10 +113,10 @@ static const IntAStar = new Effect {
 		while (steps--)
 		{
 			var current = HeapExtract(state.open);
-			if (DeepEqual(current[2], state.goal))
+			if (ops->goal_equal(current[2], state.goal))
 			{
 				// Reconstruct the path.
-				var path = [state.goal];
+				var path = [current[2]];
 				while (current = current[3])
 					PushFront(path, current[2]);
 				//Log("done after %d frames", this.Time);
@@ -129,13 +145,13 @@ global func _AStarExpand(proplist state, proplist ops, array current)
 		/* Log(" - successor: %v", successor); */
 		// Skip successor if it's in the closed list.
 		var i = 0, el;
-		while ((el = state.closed[i++]) && !DeepEqual(el, successor));
+		while ((el = state.closed[i++]) && !ops->node_equal(el, successor));
 		if (el)
 			continue;
 		var cost = current[1] + ops->cost(current[2], successor);
 		// Find successor in the open list.
 		i = 0;
-		while ((el = state.open[i++]) && !DeepEqual(el[2], successor));
+		while ((el = state.open[i++]) && !ops->node_equal(el[2], successor));
 		if (el && el[1] <= cost)
 			continue;
 		successor = [cost + ops->distance(successor, state.goal), cost, successor, current];
