@@ -47,40 +47,54 @@ func OnHitByPickaxe()
 	Destruct();
 }
 
-func PreviewBuildingCondition(callers)
+func PreviewBuildingCondition()
 {
-
-	if (BuildingCondition())
-		return true;
+	this.already_found = true;
+	var objects = [this];
+	var flag = false;
 	
-	if (VerticesStuck() == GetVertexNum()+1)
-		return false;
-	
-	for(var obj in FindObjects(Find_Exclude(this), Find_Or(Find_OnLine(-tile_size_x/2-1, 0, tile_size_x/2+1, 0), Find_OnLine(0, -tile_size_y/2-1, 0, tile_size_y/2+2))
-			,Find_Func("IsPreview"), Find_ID(GetID()), Find_Owner(GetController())))
+	for (var i = 0; i < GetLength(objects); ++i)
 	{
+		var current = objects[i];
+		if (!current) continue;
 		
-		var flag = 0;
-		for(var caller in callers)
+		var cneigh = current->GetNeighbourPreviews(true);
+		
+		if (GetLength(cneigh)==0)
+			flag = BuildingCondition();
+		
+		for (var neighbour in cneigh)
 		{
-			if(obj == caller)
+			neighbour.already_found = true;;
+			PushBack(objects, neighbour);
+			
+			if (neighbour->BuildingCondition())
 			{
-				flag = 1;
+				flag = true;
 				break;
 			}
 		}
 		
 		if (flag)
-			continue;
-		
-		PushBack(callers, this);
-		
-		if(obj->PreviewBuildingCondition(callers))
-			return true;
+			break;
 	}
 	
-	return false;
+	for (var o in objects)
+	{
+		if (o) o.already_found = nil;
+	}
+	
+	if (!SpecialPreviewCondition())
+		flag = false;
+	
+	return flag;
 }
+
+func SpecialPreviewCondition()
+{
+	return true;
+}
+
 
 func AdjustSurroundingMaterial(up, down, left, right)
 {
@@ -150,4 +164,19 @@ func AdjustSurroundingMaterial(up, down, left, right)
 			}
 		}
 	}
+}
+
+private func GetNeighbourPreviews(bool ignore_cycles)
+{
+	var blocks = [];
+	var x_pos = [-1, +1, 0, 0];
+	var y_pos = [0, 0, -1, 1];
+	for (var i = 0; i < 4; ++i)
+	{
+		var block = FindObject(Find_AtPoint(x_pos[i] * build_grid_x, y_pos[i] * build_grid_y), Find_ID(GetID()), Find_Controller(GetController()), Find_Func("IsPreview"), Find_Category(C4D_StaticBack));
+		if (!block) continue;
+		if (block.already_found && ignore_cycles) continue;
+		PushBack(blocks, block);
+	}
+	return blocks;
 }

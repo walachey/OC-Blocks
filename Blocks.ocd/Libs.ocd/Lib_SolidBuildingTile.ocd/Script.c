@@ -24,17 +24,6 @@ func Constructed()
 	return _inherited();
 }
 
-func PreviewBuildingCondition(caller)
-{
-	if (FindObject(Find_AtRect(-tile_size_x/2, -tile_size_y/2, tile_size_x, tile_size_y), 
-		Find_Exclude(this), 
-		Find_Not(Find_Category(C4D_Object)),
-		Find_Not(Find_Func("IsPreview")), 
-		Find_Not(Find_Func("IsWallBuildingTile"))))
-		return false;
-		
-	return _inherited(caller);
-}
 
 func BuildingCondition()
 {
@@ -58,6 +47,21 @@ func BuildingCondition()
 		return true;
 	
 	return false;
+}
+
+func SpecialPreviewCondition()
+{
+	if (VerticesStuckSemi() == GetVertexNum()+1)
+		return false;
+	
+	if (FindObject(Find_AtRect(-tile_size_x/2, -tile_size_y/2, tile_size_x, tile_size_y), 
+		Find_Exclude(this), 
+		Find_Not(Find_Category(C4D_Object)),
+		Find_Not(Find_Func("IsPreview")), 
+		Find_Not(Find_Func("IsWallBuildingTile"))))
+		return false;
+	
+	return _inherited();
 }
 
 func Destruct()

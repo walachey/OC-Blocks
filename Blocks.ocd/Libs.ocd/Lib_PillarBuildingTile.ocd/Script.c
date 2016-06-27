@@ -87,3 +87,11 @@ public func OnBecomeUnstable()
 		position_y -= build_grid_y;
 	}
 }
+
+func SpecialPreviewCondition()
+{
+	if (VerticesStuckSemi() == GetVertexNum()+1)
+		return false;
+	
+	return _inherited();
+}

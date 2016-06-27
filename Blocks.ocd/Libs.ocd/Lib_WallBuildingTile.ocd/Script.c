@@ -74,3 +74,11 @@ func BuildingCondition()
 	
 	return false;
 }
+
+func SpecialPreviewCondition()
+{
+	if (VerticesStuckSemi() == GetVertexNum()+1)
+		return false;
+	
+	return _inherited();
+}
