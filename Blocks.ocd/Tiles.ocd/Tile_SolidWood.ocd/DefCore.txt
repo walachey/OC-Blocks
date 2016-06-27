@@ -2,9 +2,9 @@
 id=Tile_SolidWood
 Version=6,0
 Category=C4D_Object
-Width=12
-Height=12
-Offset=-6,-6
+Width=10
+Height=10
+Offset=-5,-5
 Vertices=3
 VertexX=0,3,-3
 VertexY=2,-2,-2
