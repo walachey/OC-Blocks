@@ -98,6 +98,7 @@ public func OnBecomeUnstable()
 	if (pillar) pillar->Destroy();
 	
 	if (this && this.no_propagation) return;
+	if (!this) return;
 	for (var neighbour in GetNeighbours())
 		if (neighbour) neighbour->CheckSupport();
 }
