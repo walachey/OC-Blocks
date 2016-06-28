@@ -168,7 +168,7 @@ private func DrawPreviewLine(int from_x, int from_y, int to_x, int to_y)
 	else ydir = BoundBy(len_y, -1, 1);
 	
 	// Round up.
-	var blocks = len / build_grid_x + 1;
+	var blocks = Min(len / build_grid_x + 1, 25);
 	
 	var x = starting_point_x;
 	var y = starting_point_y;

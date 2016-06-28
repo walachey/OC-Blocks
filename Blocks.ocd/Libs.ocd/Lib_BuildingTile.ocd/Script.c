@@ -68,11 +68,12 @@ func PreviewBuildingCondition()
 			neighbour.already_found = true;;
 			PushBack(objects, neighbour);
 			
-			if (neighbour->BuildingCondition())
-			{
-				flag = true;
+			if (neighbour.preview_buffer != nil)
+				flag = neighbour.preview_buffer;
+			else
+				flag = neighbour->BuildingCondition();
+			if (flag)
 				break;
-			}
 		}
 		
 		if (flag)
@@ -87,7 +88,15 @@ func PreviewBuildingCondition()
 	if (!SpecialPreviewCondition())
 		flag = false;
 	
+	this.preview_buffer = flag;
+	AddEffect("ClearBuffer", this, 1, 1, this);
+	
 	return flag;
+}
+
+func FxClearBufferStop()
+{
+	this.preview_buffer = nil;
 }
 
 func SpecialPreviewCondition()
