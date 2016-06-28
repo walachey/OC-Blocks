@@ -10,7 +10,7 @@
 local Name = "$Name$";
 local Description = "$Description$";
 local Collectible = 1;
-local Plane = 10;
+local Plane = 15;
 
 local tile_mode = TILE_MODE_LINE;
 
