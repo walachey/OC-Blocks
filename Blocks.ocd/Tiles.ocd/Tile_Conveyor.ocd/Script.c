@@ -54,7 +54,7 @@ func Constructed()
 	AddTimer("CheckObjects", 60 + Random(20));
 }
 
-public func Destroy()
+public func Destruct()
 {
 	RemoveTimer("CheckObjects");
 	return inherited(...);
