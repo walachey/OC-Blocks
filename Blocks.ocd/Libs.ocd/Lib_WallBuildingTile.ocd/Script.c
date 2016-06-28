@@ -62,13 +62,13 @@ func Destroy()
 
 func BuildingCondition()
 {
-	if (FindObject(Find_AtPoint(), Find_Func("IsWallBuildingTile"), Find_Exclude(this)))
+	if (FindObject(Find_AtPoint(), Find_NoContainer(), Find_Func("IsWallBuildingTile"), Find_Not(Find_Func("IsPreview")), Find_Exclude(this)))
 		return false;
 
 	if (VerticesStuckSemi() == GetVertexNum()+1)
 		return false;
 
-	if (FindObject(Find_Exclude(this), Find_Func("IsBuildingTile"), Find_Not(Find_Func("IsPreview")),
+	if (FindObject(Find_Exclude(this), Find_NoContainer(), Find_Func("IsBuildingTile"), Find_Not(Find_Func("IsPreview")),
 		Find_Or(Find_OnLine(-tile_size_x/2-1, 0, tile_size_x/2+1, 0), Find_OnLine(0, -tile_size_y/2-1, 0, tile_size_y/2+2))))
 		return true;
 	

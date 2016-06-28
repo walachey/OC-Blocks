@@ -25,13 +25,13 @@ func Constructed()
 
 func BuildingCondition()
 {
-	if (FindObject(Find_Not(Find_Func("IsPreview")), Find_AtPoint(), Find_Func("IsPillarBuildingTile"), Find_Exclude(this)))
+	if (FindObject(Find_Not(Find_Func("IsPreview")), Find_NoContainer(), Find_AtPoint(), Find_Func("IsPillarBuildingTile"), Find_Exclude(this)))
 		return false;
 
 	if (VerticesStuckSemi() == GetVertexNum()+1)
 		return false;
 	
-	if (FindObject(Find_AtPoint(0, tile_size_y), Find_Not(Find_Func("IsPreview")), Find_Or(Find_Func("IsSolidBuildingTile"), Find_Func("IsPillarBuildingTile"))) 
+	if (FindObject(Find_AtPoint(0, tile_size_y), Find_NoContainer(), Find_Not(Find_Func("IsPreview")), Find_Or(Find_Func("IsSolidBuildingTile"), Find_Func("IsPillarBuildingTile"))) 
 		|| GBackSolid(0, (tile_size_y)))
 		return true;
 	

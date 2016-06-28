@@ -61,17 +61,20 @@ func PreviewBuildingCondition()
 		var cneigh = current->GetNeighbourPreviews(true);
 		
 		if (GetLength(cneigh)==0)
+		{
 			flag = BuildingCondition();
+		}
 		
 		for (var neighbour in cneigh)
 		{
-			neighbour.already_found = true;;
+			neighbour.already_found = true;
 			PushBack(objects, neighbour);
 			
 			if (neighbour.preview_buffer != nil)
 				flag = neighbour.preview_buffer;
 			else
 				flag = neighbour->BuildingCondition();
+				
 			if (flag)
 				break;
 		}

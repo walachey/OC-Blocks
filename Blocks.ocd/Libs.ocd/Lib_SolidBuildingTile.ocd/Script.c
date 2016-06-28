@@ -32,6 +32,7 @@ func BuildingCondition()
 	
 	if (FindObject(Find_AtRect(-tile_size_x/2, -tile_size_y/2, tile_size_x, tile_size_y), 
 		Find_Exclude(this), 
+		Find_NoContainer(),
 		Find_Not(Find_Category(C4D_Object)),
 		Find_Not(Find_Func("IsPreview")), 
 		Find_Not(Find_Func("IsWallBuildingTile"))))
@@ -55,7 +56,8 @@ func SpecialPreviewCondition()
 		return false;
 	
 	if (FindObject(Find_AtRect(-tile_size_x/2, -tile_size_y/2, tile_size_x, tile_size_y), 
-		Find_Exclude(this), 
+		Find_Exclude(this),
+		Find_NoContainer(), 
 		Find_Not(Find_Category(C4D_Object)),
 		Find_Not(Find_Func("IsPreview")), 
 		Find_Not(Find_Func("IsWallBuildingTile"))))
