@@ -57,7 +57,8 @@ public func ControlUseStart(object clonk, int x, int y)
 	starting_point_y = GetRightY(clonk->GetY() + y);
 	
 	SetController(clonk->GetOwner());
-	CreatePreviewObject();
+	var obj = CreatePreviewObject();
+	PushBack(preview_objects, obj);
 	ControlUseHolding(clonk, x, y);
 	
 	return true;
