@@ -32,10 +32,13 @@ func BuildingCondition()
 	if (VerticesStuckSemi() == GetVertexNum()+1)
 		return false;
 	
-	if (!FindObject(Find_Distance(3*tile_size_y), Find_Not(Find_Func("IsPreview")), Find_Or(Find_Func("IsSolidBuildingTile"), Find_Func("IsPillarBuildingTile")))) 
-		return false;
+	if (FindObject(Find_Exclude(this), Find_Not(Find_Func("IsPreview")), Find_NoContainer(), Find_Property("IsConveyorBuildingTile"), Find_Or(Find_OnLine(-tile_size_x/2-1, 0, tile_size_x/2+1, 0), Find_OnLine(0, -tile_size_y/2-1, 0, tile_size_y/2+2))))
+		return true;
 	
-	return true;
+	if (FindObject(Find_AtPoint(), Find_Not(Find_Func("IsPreview")), Find_Func("IsPillarBuildingTile"), Find_NoContainer(), Find_Func("IsBuildingTile"), Find_Exclude(this)))
+		return true;
+	
+	return false;
 }
 
 func Constructed()
