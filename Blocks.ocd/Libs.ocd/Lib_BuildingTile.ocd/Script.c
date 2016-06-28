@@ -67,13 +67,14 @@ func PreviewBuildingCondition()
 		
 		for (var neighbour in cneigh)
 		{
-			neighbour.already_found = true;
-			PushBack(objects, neighbour);
-			
 			if (neighbour.preview_buffer != nil)
 				flag = neighbour.preview_buffer;
 			else
+			{
+				neighbour.already_found = true;
+				PushBack(objects, neighbour);
 				flag = neighbour->BuildingCondition();
+			}
 				
 			if (flag)
 				break;

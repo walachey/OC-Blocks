@@ -118,7 +118,6 @@ private func DrawPreviewRect(int from_x, int from_y, int to_x, int to_y)
 	var xdir = 0;
 	var ydir = 0;
 
-	
 	xdir = BoundBy(len_x, -1, 1);
 	ydir = BoundBy(len_y, -1, 1);
 	
@@ -131,23 +130,31 @@ private func DrawPreviewRect(int from_x, int from_y, int to_x, int to_y)
 	
 	var sizey = nil;
 	var sizex = nil;
+	
 	if (preview_width != nil && GetLength(preview_objects))
 	{
 		sizey = GetLength(preview_objects)/preview_width;
 		sizex = GetLength(preview_objects)/preview_height;
 	}
 	
+	var new_previews = [];
+	SetLength(new_previews, blocksX*blocksY);
+	
 	var x = starting_point_x;
 	var y = starting_point_y;
 	for (var i = 0; i < blocksX; ++i)
 	{
 		var block;
-		if (sizey == nil || i >= sizex)
+		if (sizex == nil || i >= sizex)
 		{
 			block = CreatePreviewObject();
 		}
 		else 
+		{
 			block = preview_objects[i * sizey];
+			preview_objects[i * sizey] = nil;
+		}
+		new_previews[i * sizey] = block;
 		//block = CreatePreviewObject();
 		if (!block) continue;
 		
@@ -158,10 +165,16 @@ private func DrawPreviewRect(int from_x, int from_y, int to_x, int to_y)
 		for (var u = 1; u < blocksY; ++u)
 		{
 			//block = CreatePreviewObject();
-			if (sizex == nil || (u) >= sizey)
+			if (sizex == nil || u >= sizey)
 				block = CreatePreviewObject();
 			else 
+			{
 				block = preview_objects[i * sizey + u];
+				preview_objects[i * sizey + u] = nil;
+			}
+			
+			new_previews[i * sizey + u] = block;	
+			
 			if (!block) continue;
 			
 			block->SetPosition(x, y);
@@ -171,7 +184,7 @@ private func DrawPreviewRect(int from_x, int from_y, int to_x, int to_y)
 		x += xdir * build_grid_x;
 	}
 	
-	if (preview_width != nil)
+	/*if (preview_width != nil)
 	{
 		var mx = blocksX;
 		var my = blocksY;
@@ -197,11 +210,12 @@ private func DrawPreviewRect(int from_x, int from_y, int to_x, int to_y)
 			}
 			mx++;
 		}
-	}
-	
+	}*/
+	ClearPreviewObjects();
 	preview_width = blocksX;
 	preview_height = blocksY;
-	SetLength(preview_objects, blocksX*blocksY);
+	//SetLength(preview_objects, blocksX*blocksY);
+	preview_objects = new_previews;
 }
 
 private func DrawPreviewLine(int from_x, int from_y, int to_x, int to_y)
@@ -224,7 +238,10 @@ private func DrawPreviewLine(int from_x, int from_y, int to_x, int to_y)
 	{
 		var block;
 		if (i >= GetLength(preview_objects))
+		{
 			block = CreatePreviewObject();
+			PushBack(preview_objects, block);
+		}
 		else block = preview_objects[i];
 		if (!block) continue;
 		
@@ -250,7 +267,6 @@ private func CreatePreviewObject()
 	var preview_object = CreateObject(GetID(), 0, 0, GetController());
 	preview_object.Collectible = 0;
 	preview_object->PreviewMode();
-	PushBack(preview_objects, preview_object);
 	return preview_object;
 }
 
