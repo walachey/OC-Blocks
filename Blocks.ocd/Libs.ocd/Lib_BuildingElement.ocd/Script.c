@@ -99,6 +99,7 @@ public func ControlUseStop(object clonk, int x, int y)
 			obj.Collectible = 0;
 			flag = true;
 			preview_objects[i] = nil;
+			preview_object->RemoveObject();
 		}
 		
 		if (!flag)
