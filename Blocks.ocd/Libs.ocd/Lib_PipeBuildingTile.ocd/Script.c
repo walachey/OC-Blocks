@@ -140,7 +140,7 @@ private func AddNeighbour(string direction, object neighbour, bool no_recursion)
 		--neighbour_count;
 	else if (neighbour && !neighbours[direction])
 		++neighbour_count;
-	var idx_map = {"left" = 0, "right" = 1, "up" = 3, "bottom" = 4};
+	var idx_map = {"left" = 0, "right" = 1, "up" = 2, "bottom" = 3};
 	neighbours_as_list[idx_map[direction]] = neighbour; 
 	neighbours[direction] = neighbour;
 	
