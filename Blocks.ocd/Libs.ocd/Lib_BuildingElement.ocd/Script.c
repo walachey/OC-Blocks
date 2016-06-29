@@ -84,9 +84,10 @@ public func ControlUseStop(object clonk, int x, int y)
 	while (true)
 	{
 		var flag = false;
-	
-		for (var preview_object in preview_objects)
+		var len = GetLength(preview_objects);
+		for (var i = 0; i < len; ++i)
 		{
+			var preview_object = preview_objects[i];
 			if (!preview_object) continue;
 			if (!preview_object->BuildingCondition()) continue;
 			var obj = this->TakeObject();
@@ -94,6 +95,7 @@ public func ControlUseStop(object clonk, int x, int y)
 			obj->Constructed();
 			obj.Collectible = 0;
 			flag = true;
+			preview_objects[i] = nil;
 		}
 		
 		if (!flag)
