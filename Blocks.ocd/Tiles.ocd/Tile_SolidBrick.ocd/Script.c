@@ -6,6 +6,8 @@ local Name = "$Name$";
 local Description = "$Description$";
 local Collectible = 1;
 
+local AutoFillWallDefinition = Tile_WallBrick;
+
 protected func Hit(x, y)
 {
 	StonyObjectHit(x,y);

@@ -17,10 +17,13 @@ local HitPoints = 50;
 
 func IsSolidBuildingTile() { return true; }
 
+local AutoFillWallDefinition = nil;
+
 func Constructed()
 {
 	SetSolidMask(0,0,tile_size_x,tile_size_y);
 	AdjustSurroundingMaterial(true, true, true, true);
+	CheckAutoFillWall();
 	return _inherited();
 }
 
@@ -235,4 +238,47 @@ private func UpdateDamageDisplay()
 		Attach = ATTACH_Front | ATTACH_MoveRelative
 	};
 	CreateParticle("Fire", PV_Random(-4, 4), PV_Random(-4, 4), 0, 0, 0, particles, 3 * GetDamage() / 2);
+}
+
+private func CheckAutoFillWall()
+{
+	if (!AutoFillWallDefinition) return;
+	
+	for (var direction = -1; direction <= +1; direction += 2)
+	{
+		var offset_y = 0;
+		var valid = false;
+		do
+		{
+			offset_y += direction * build_grid_y;
+			var absolute_y = GetY() + offset_y;
+			if (absolute_y < 0 || absolute_y >= LandscapeHeight()) break;
+			
+			if (FindObject(Find_AtPoint(0, offset_y), Find_ID(GetID()), Find_Property("is_constructed")))
+			{
+				valid = true;
+				break;
+			}
+			
+			if (GBackSolid(0, offset_y)) break;
+		} while (true);
+		
+		if (!valid) continue;
+		
+		var y = 0;
+		while (y != offset_y)
+		{
+			y += direction * build_grid_y;
+			var wall = CreateObject(AutoFillWallDefinition, 0, y, GetOwner());
+			wall->PreviewMode();
+			if (!wall->BuildingCondition())
+			{
+				wall->RemoveObject();
+				continue;
+			}
+			wall->RemoveObject();
+			wall = CreateObject(AutoFillWallDefinition, 0, y, GetOwner());
+			wall->Constructed();
+		}
+	}
 }

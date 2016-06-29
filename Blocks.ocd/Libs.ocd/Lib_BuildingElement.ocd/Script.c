@@ -96,7 +96,6 @@ public func ControlUseStop(object clonk, int x, int y)
 			var obj = this->TakeObject();
 			obj->SetPosition(preview_object->GetX(), preview_object->GetY());
 			obj->Constructed();
-			obj.Collectible = 0;
 			flag = true;
 			preview_objects[i] = nil;
 			preview_object->RemoveObject();
@@ -295,6 +294,7 @@ func FxRemovePreviewStop()
 func Constructed()
 {
 	is_constructed = true;
+	this.Collectible = false;
 	return true;
 }
 
