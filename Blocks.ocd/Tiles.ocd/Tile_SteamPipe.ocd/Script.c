@@ -26,6 +26,7 @@ public func Definition()
 {
 	this.steam_particles = new Particles_Smoke()
 	{
+		Size = PV_Linear(0, PV_Random(20, 50)),
 		ForceX = PV_Random(-5, 5, 10),
 		ForceY = PV_Random(-5, 5, 10),
 		R = 255, G = 255, B = 255, 
@@ -103,8 +104,9 @@ private func CheckBurningObjects()
 	var total_fire_value = 0;
 	for (var obj in FindObjects(Find_AtRect(-build_grid_x, -build_grid_y, 2 * build_grid_x, 5 * build_grid_y), Find_Func("OnFire")))
 	{
-		var fire_value = obj->GetMass() + obj->~GetFuelAmount() / 10;
-		total_fire_value += fire_value;
+		var fuel_value = Min(10, obj->GetMass() / 5) + obj->~GetFuelAmount() / 10;
+		var fire_amount = obj->OnFire();
+		total_fire_value += fire_amount * fuel_value / 100;
 	}
 	DoSteam(total_fire_value);
 }
@@ -135,7 +137,7 @@ private func CheckSteam()
 		if (open_offset_x != nil)
 		{
 			var loss = Max(5, steam_level / 4);
-			CreateParticle("Dust", PV_Random(open_offset_x - 5, open_offset_x + 5), PV_Random(open_offset_y - 5, open_offset_y + 5), 0, 0, PV_Random(10, 200), this.steam_particles, 10 * loss);
+			CreateParticle("Dust", open_offset_x, open_offset_y, 0, 0, PV_Random(10, 200), this.steam_particles, loss);
 			DoSteam(-loss);
 			if (!Random(3))
 				Sound("Liquids::Sizzle", {pitch = 5 + Random(5), volume = 5});
