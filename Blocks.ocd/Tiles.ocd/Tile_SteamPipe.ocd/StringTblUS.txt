@@ -1,0 +1,2 @@
+Name=Steam Pipe
+Description=Can be heated with fire and transports steam.

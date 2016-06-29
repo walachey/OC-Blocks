@@ -1,0 +1,2 @@
+Name=Dampfrohr
+Description=Kann mit Feuer erhitzt werden und transportiert Dampf.
