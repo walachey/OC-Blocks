@@ -5,7 +5,7 @@
 	@author 
 */
 
-#include Lib_BuildingTile
+#include Lib_PipeBuildingTile
 
 local Name = "$Name$";
 local Description = "$Description$";
@@ -15,8 +15,7 @@ local Plane = 14;
 local tile_mode = TILE_MODE_LINE;
 
 local IsSteamPipeBuildingTile = true;
-
-local neighbours;
+local TileKindPropertyName = "IsSteamPipeBuildingTile";
 
 local steam_level = 0;
 
@@ -35,12 +34,11 @@ public func Definition()
 		Alpha = PV_Linear(16, 0),
 		Rotation = PV_Random(360)
 	};
+	return _inherited();
 }
 
 public func Construction()
 {
-	neighbours = {left = nil, right = nil, up = nil, bottom = nil};
-	this.UpdateGraphics = Tile_Conveyor.UpdateGraphics;
 	return inherited();
 }
 
@@ -50,43 +48,10 @@ protected func Hit(x, y)
 	return true;
 }
 
-func BuildingCondition()
-{
-	if (FindObject(Find_AtPoint(), Find_Property("is_constructed"), Find_Not(Find_Or(Find_Func("IsWallBuildingTile"), Find_Func("IsPillarBuildingTile"))), Find_Func("IsBuildingTile"), Find_Exclude(this)))
-		return false;
-
-	if (VerticesStuckSemi() == GetVertexNum()+1)
-		return false;
-	
-	if (FindObject(Find_Or(Find_OnLine(-tile_size_x/2-1, 0, tile_size_x/2+1, 0), Find_OnLine(0, -tile_size_y/2-1, 0, tile_size_y/2+2)),
-		Find_Exclude(this), Find_Property("is_constructed"), Find_Property("IsSteamPipeBuildingTile")))
-		return true;
-	
-	if (FindObject(Find_AtPoint(), Find_Property("is_constructed"), Find_Func("IsPillarBuildingTile"), Find_Exclude(this)))
-		return true;
-	
-	return false;
-}
-
-func Constructed()
+public func Constructed()
 {
 	_inherited();
-	
-	var current_neighbours = GetNeighboursAsMatrix();
-	AddNeighbour("left", current_neighbours[0][1]);
-	AddNeighbour("right", current_neighbours[2][1]);
-	AddNeighbour("up", current_neighbours[1][0]);
-	AddNeighbour("bottom", current_neighbours[1][2]);
-	this->UpdateGraphics(current_neighbours);
-	
-	var neighbour_count = 0;
-	for (var neighbour in [neighbours.left, neighbours.right, neighbours.up, neighbours.bottom])
-	{
-		if (!neighbour) continue;
-		neighbour->UpdateGraphics(neighbour->GetNeighboursAsMatrix());
-		++neighbour_count;
-	}
-	
+
 	if (neighbour_count != 1)
 	{
 		open_offset_x = nil;
@@ -105,13 +70,11 @@ public func CheckOpenOffset(bool full_check)
 	open_offset_x = 0;
 	open_offset_y = 0;
 
-	var neighbour_count = 0;
 	for (var i = 0; i < 4; ++i)
 	{
 		var neighbour = neighbour_list[i];
 		if (!neighbour) continue;
 		var direction = directions[i];
-		++neighbour_count;
 		
 		if (direction == "left")
 			open_offset_x = build_grid_x/2;
@@ -176,11 +139,9 @@ private func CheckSteam()
 	if (steam_level <= 0) return;
 	
 	var min_steam_neighbour = nil;
-	var neighbour_count = 0;
 	for (var neighbour in [neighbours.left, neighbours.right, neighbours.up, neighbours.bottom])
 	{
 		if (!neighbour) continue;
-		++neighbour_count;
 		if (!min_steam_neighbour || neighbour.steam_level < min_steam_neighbour.steam_level)
 			min_steam_neighbour = neighbour;
 	}
@@ -231,18 +192,8 @@ public func DoSteam(int change)
 	SetClrModulation(RGB(255, discolored, discolored));
 }
 
-private func AddNeighbour(string direction, object neighbour, bool no_recursion)
+public func OnAddedNeighbour(string direction, object neighbour)
 {
-	neighbours[direction] = neighbour;
-	if (!neighbour) return;
-
-	if (!no_recursion)
-	{
-		var mapping = {left = "right", right = "left", up = "bottom", bottom = "up"};
-		neighbour->AddNeighbour(mapping[direction], this, true);
-		neighbour->CheckOpenOffset();
-	}
-
 	open_offset_x = 0;
 	open_offset_y = 0;
 	if (direction == "left")
@@ -253,43 +204,8 @@ private func AddNeighbour(string direction, object neighbour, bool no_recursion)
 		open_offset_y = +build_grid_y/2;
 	else if (direction == "bottom")
 		open_offset_y = -build_grid_y/2;
+	neighbour->CheckOpenOffset();
 }
-
-private func GetNeighboursAsMatrix(bool ignore_cycles)
-{
-	var blocks = [[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]];
-	var x_pos = [-1, +1, 0, 0];
-	var y_pos = [0, 0, -1, +1];
-	for (var i = 0; i < 4; ++i)
-	{
-		var block = FindObject(Find_AtPoint(x_pos[i] * build_grid_x, y_pos[i] * build_grid_y), Find_Property("is_constructed"), Find_Property("IsSteamPipeBuildingTile"));
-		if (!block) continue;
-		if (ignore_cycles && block.already_found) continue;
-		blocks[1 + x_pos[i]][1 + y_pos[i]] = block;
-	}
-	return blocks;
-}
-
-private func GetNeighbours(bool ignore_cycles)
-{
-	var blocks = [];
-	var x_pos = [-1, +1, 0, 0];
-	var y_pos = [0, 0, -1, +1];
-	for (var i = 0; i < 4; ++i)
-	{
-		var block = FindObject(Find_AtPoint(x_pos[i] * build_grid_x, y_pos[i] * build_grid_y), Find_Property("is_constructed"), Find_Property("IsSteamPipeBuildingTile"));
-		if (!block) continue;
-		if (block.already_found && ignore_cycles) continue;
-		PushBack(blocks, block);
-	}
-	return blocks;
-}
-
-private func IsNeighbour(object other)
-{
-	return other->GetID() == GetID() && ObjectDistance(other) <= Distance(0, 0, build_grid_x, build_grid_y);
-}
-
 
 local Components = {Wood = 1};
 public func IsToolProduct() { return true; }
