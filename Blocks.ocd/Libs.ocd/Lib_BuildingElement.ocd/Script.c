@@ -24,7 +24,8 @@ local preview_height;
 static const TILE_MODE_SINGLE = 1;
 static const TILE_MODE_LINE = 2;
 static const TILE_MODE_VERTICAL_LINE = 3;
-static const TILE_MODE_RECTANGLE = 4;
+static const TILE_MODE_HORIZONTAL_LINE = 4;
+static const TILE_MODE_RECTANGLE = 5;
 local tile_mode = TILE_MODE_SINGLE;
 
 func IsBuildingElement() { return true; }
@@ -68,12 +69,15 @@ public func ControlUseHolding(object clonk, int x, int y)
 {
 	var tx = GetRightX(clonk->GetX() + x);
 	var ty = GetRightY(clonk->GetY() + y);
+	
 	if (tile_mode == TILE_MODE_SINGLE)
 		preview_objects[0]->SetPosition(tx, ty);
 	else if (tile_mode == TILE_MODE_LINE)
 		DrawPreviewLine(starting_point_x, starting_point_y, clonk->GetX() + x, clonk->GetY() + y);
 	else if (tile_mode == TILE_MODE_VERTICAL_LINE)
 		DrawPreviewLine(starting_point_x, starting_point_y, starting_point_x, clonk->GetY() + y);
+	else if (tile_mode == TILE_MODE_HORIZONTAL_LINE)
+		DrawPreviewLine(starting_point_x, starting_point_y, clonk->GetX() + x, starting_point_y);
 	else if (tile_mode == TILE_MODE_RECTANGLE)
 		DrawPreviewRect(starting_point_x, starting_point_y, clonk->GetX() + x, clonk->GetY() + y);
 	return true;
