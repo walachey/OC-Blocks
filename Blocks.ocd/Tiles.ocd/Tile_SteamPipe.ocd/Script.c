@@ -60,9 +60,8 @@ public func Constructed()
 	AddTimer("CheckBurningObjects", 20 + Random(10));
 }
 
-public func CheckOpenOffset(bool full_check)
+public func CheckOpenOffset()
 {
-	var neighbour_list = [neighbours.left, neighbours.right, neighbours.up, neighbours.bottom];
 	var directions = ["left", "right", "up", "bottom"];
 
 	open_offset_x = 0;
@@ -70,7 +69,7 @@ public func CheckOpenOffset(bool full_check)
 
 	for (var i = 0; i < 4; ++i)
 	{
-		var neighbour = neighbour_list[i];
+		var neighbour = neighbours_as_list[i];
 		if (!neighbour) continue;
 		var direction = directions[i];
 		
@@ -95,30 +94,8 @@ public func Destruct()
 {
 	RemoveTimer("CheckSteam");
 	RemoveTimer("CheckBurningObjects");
-	OnDetached();
-	return inherited(...);
-}
-
-public func Destroy()
-{
-	OnDetached();
-	RemoveObject();
-}
-
-private func OnDetached()
-{
-	is_constructed = false;
 	
-	var mirrored_directions = ["right", "left", "bottom", "up"];
-	var neighbour_list = [neighbours.left, neighbours.right, neighbours.up, neighbours.bottom];
-	for (var i = 0; i < 4; ++i)
-	{
-		var neighbour = neighbour_list[i];
-		if (!neighbour) continue;
-		neighbour->AddNeighbour(mirrored_directions[i], nil);
-		neighbour->CheckOpenOffset(true);
-		neighbour->UpdateGraphics(neighbour->GetNeighboursAsMatrix());
-	}
+	return inherited(...);
 }
 
 private func CheckBurningObjects()
@@ -197,17 +174,9 @@ public func DoSteam(int change)
 
 public func OnAddedNeighbour(string direction, object neighbour)
 {
-	open_offset_x = 0;
-	open_offset_y = 0;
-	if (direction == "left")
-		open_offset_x = build_grid_x/2;
-	else if (direction == "right")
-		open_offset_x = -build_grid_x/2;
-	else if (direction == "up")
-		open_offset_y = +build_grid_y/2;
-	else if (direction == "bottom")
-		open_offset_y = -build_grid_y/2;
-	neighbour->CheckOpenOffset();
+	CheckOpenOffset();
+	if (neighbour)
+		neighbour->CheckOpenOffset();
 }
 
 local Components = {Wood = 1};
