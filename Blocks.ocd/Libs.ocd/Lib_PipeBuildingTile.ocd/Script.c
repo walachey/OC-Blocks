@@ -11,7 +11,7 @@ local Name = "$Name$";
 local Description = "$Description$";
 
 
-local tile_mode = TILE_MODE_VERTICAL_LINE;
+local tile_mode = TILE_MODE_LINE;
 local Plane = 15;
 
 local IsPipeBuildingTile = true;
@@ -20,6 +20,8 @@ local IsPipeBuildingTile = true;
 local TileKindPropertyName = "IsPipeBuildingTile";
 // Neighbours as a proplist (left/right/up/bottom).
 local neighbours;
+// Neighbours in a list (always up to date, can contain nil).
+local neighbours_as_list;
 // Neighbours in 3x3 array. MIGHT not be up to date at all times.
 local last_neighbours_as_matrix;
 // Amount of current neighbours.
@@ -36,6 +38,7 @@ public func Constructed()
 	
 	neighbour_count = 0;
 	neighbours = {left = nil, right = nil, up = nil, bottom = nil};
+	neighbours_as_list = [nil, nil, nil, nil];
 		
 	var current_neighbours = GetNeighboursAsMatrix();
 	AddNeighbour("left", current_neighbours[0][1]);
@@ -51,22 +54,55 @@ public func Constructed()
 	}
 }
 
+private func IsOtherPipeType(string pipe_type)
+{
+	return is_constructed && IsPipeBuildingTile && TileKindPropertyName != pipe_type;
+}
+
+private func IsSamePipeType(string pipe_type)
+{
+	return is_constructed && IsPipeBuildingTile && TileKindPropertyName == pipe_type;
+}
+
+private func IsOverlayedByOtherPipe()
+{
+	return FindObject(Find_AtPoint(), Find_Func("IsOtherPipeType", TileKindPropertyName)) != nil;
+}
+
+private func CanSupportOtherPipeTile()
+{
+	return !IsOverlayedByOtherPipe();
+}
+
 public func BuildingCondition()
 {
-	if (FindObject(Find_AtPoint(), Find_Property("is_constructed"), Find_Not(Find_Or(Find_Func("IsWallBuildingTile"), Find_Func("IsPillarBuildingTile"))), Find_Func("IsBuildingTile"), Find_Exclude(this)))
+	if (FindObject(Find_AtPoint(), Find_Property("is_constructed"),
+		Find_Not(Find_Or(Find_Func("IsWallBuildingTile"), Find_Func("IsPillarBuildingTile"), Find_Func("IsOtherPipeType", TileKindPropertyName))),
+		Find_Func("IsBuildingTile"), Find_Exclude(this)))
 		return false;
 
 	if (VerticesStuckSemi() == GetVertexNum()+1)
 		return false;
 	
-	if (FindObject(Find_Or(Find_OnLine(-tile_size_x/2-1, 0, tile_size_x/2+1, 0), Find_OnLine(0, -tile_size_y/2-1, 0, tile_size_y/2+2)),
-		Find_Exclude(this), Find_Property("is_constructed"), Find_Property(TileKindPropertyName)))
-		return true;
+	var is_other_pipe_there = IsOverlayedByOtherPipe();
 	
-	if (FindObject(Find_AtPoint(), Find_Property("is_constructed"), Find_Func("IsPillarBuildingTile"), Find_Exclude(this)))
+	// If trying to build an overlay, require at least one non-overlayed tile around.
+	if (is_other_pipe_there)
+	{
+		if (!FindObject(Find_Or(Find_OnLine(-tile_size_x/2-1, 0, tile_size_x/2+1, 0), Find_OnLine(0, -tile_size_y/2-1, 0, tile_size_y/2+2)),
+						Find_Exclude(this), Find_Func("IsSamePipeType", TileKindPropertyName), Find_Not(Find_Func("IsOverlayedByOtherPipe"))))
+			return false;
 		return true;
-	
-	return false;
+	}
+	else // Otherwise, just require a tile.
+	{
+		if (FindObject(Find_Or(Find_OnLine(-tile_size_x/2-1, 0, tile_size_x/2+1, 0), Find_OnLine(0, -tile_size_y/2-1, 0, tile_size_y/2+2)),
+								Find_Exclude(this), Find_Func("IsSamePipeType", TileKindPropertyName)))
+			return true;
+		if (FindObject(Find_AtPoint(), Find_Property("is_constructed"), Find_Func("IsPillarBuildingTile"), Find_Exclude(this)))
+			return true;
+		return false;
+	}
 }
 
 func Destruct()
@@ -106,7 +142,8 @@ private func AddNeighbour(string direction, object neighbour, bool no_recursion)
 		--neighbour_count;
 	else if (neighbour && !neighbours[direction])
 		++neighbour_count;
-		
+	var idx_map = {"left" = 0, "right" = 1, "up" = 3, "bottom" = 4};
+	neighbours_as_list[idx_map[direction]] = neighbour; 
 	neighbours[direction] = neighbour;
 	if (!neighbour) return;
 
@@ -114,7 +151,7 @@ private func AddNeighbour(string direction, object neighbour, bool no_recursion)
 	{
 		var mapping = {left = "right", right = "left", up = "bottom", bottom = "up"};
 		neighbour->AddNeighbour(mapping[direction], this, true);
-		this->OnAddedNeighbour(direction, neighbour);
+		this->~OnAddedNeighbour(direction, neighbour);
 	}
 }
 

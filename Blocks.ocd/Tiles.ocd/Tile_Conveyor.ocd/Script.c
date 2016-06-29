@@ -5,18 +5,15 @@
 	@author 
 */
 
-#include Lib_BuildingTile
+#include Lib_PipeBuildingTile
 
 local Name = "$Name$";
 local Description = "$Description$";
 local Collectible = 1;
 local Plane = 15;
 
-local tile_mode = TILE_MODE_LINE;
-
 local IsConveyorBuildingTile = true;
-
-local last_neighbours = [[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]];
+local TileKindPropertyName = "IsConveyorBuildingTile"; 
 
 protected func Hit(x, y)
 {
@@ -24,32 +21,9 @@ protected func Hit(x, y)
 	return true;
 }
 
-func BuildingCondition()
-{
-	if (FindObject(Find_AtPoint(), Find_Not(Find_Func("IsPreview")), Find_Not(Find_Or(Find_Func("IsWallBuildingTile"), Find_Func("IsPillarBuildingTile"))), Find_Func("IsBuildingTile"), Find_Exclude(this)))
-		return false;
-
-	if (VerticesStuckSemi() == GetVertexNum()+1)
-		return false;
-	
-	if (FindObject(Find_Exclude(this), Find_Not(Find_Func("IsPreview")), Find_NoContainer(), Find_Property("IsConveyorBuildingTile"), Find_Or(Find_OnLine(-tile_size_x/2-1, 0, tile_size_x/2+1, 0), Find_OnLine(0, -tile_size_y/2-1, 0, tile_size_y/2+2))))
-		return true;
-	
-	if (FindObject(Find_AtPoint(), Find_Not(Find_Func("IsPreview")), Find_Func("IsPillarBuildingTile"), Find_NoContainer(), Find_Func("IsBuildingTile"), Find_Exclude(this)))
-		return true;
-	
-	return false;
-}
-
 func Constructed()
 {
 	_inherited();
-	
-	var neighbours = GetNeighboursAsMatrix();
-	for (var axis in neighbours)
-		for (var obj in axis)
-			if (obj) obj->UpdateGraphics();
-	UpdateGraphics(neighbours);
 	
 	AddTimer("CheckObjects", 60 + Random(20));
 }
@@ -58,85 +32,6 @@ public func Destruct()
 {
 	RemoveTimer("CheckObjects");
 	return inherited(...);
-}
-
-private func UpdateGraphics(array neighbours)
-{
-	neighbours = neighbours || GetNeighboursAsMatrix();
-	
-	var count = 0;
-	for (var axis in neighbours)
-		for (var obj in axis)
-			if (obj) ++count;
-	if (count >= 3 || count == 1)
-	{
-		SetGraphics("");
-	}
-	else
-	if (count == 2)
-	{
-		var horizontal = (neighbours[0][1] && neighbours[2][1]);
-		var vertical = (neighbours[1][0] && neighbours[1][2]);
-		if (vertical)
-		{
-			SetGraphics("Straight");
-			SetR(0);
-		}
-		else if (horizontal)
-		{
-			SetGraphics("Straight");
-			SetR(90);
-		}
-		else
-		{
-			SetGraphics("Edge");
-			if (neighbours[1][0] && neighbours[2][1])
-				SetR(0);
-			else if (neighbours[2][1] && neighbours[1][2])
-				SetR(90);
-			else if (neighbours[1][2] && neighbours[0][1])
-				SetR(180);
-			else
-				SetR(270);
-		}
-	}
-}
-
-private func GetNeighboursAsMatrix(bool ignore_cycles)
-{
-	var blocks = [[nil, nil, nil], [nil, nil, nil], [nil, nil, nil]];
-	var x_pos = [-1, +1, 0, 0];
-	var y_pos = [0, 0, -1, +1];
-	for (var i = 0; i < 4; ++i)
-	{
-		var block = FindObject(Find_AtPoint(x_pos[i] * build_grid_x, y_pos[i] * build_grid_y), Find_Property("IsConveyorBuildingTile"), Find_Category(C4D_StaticBack));
-		if (!block) continue;
-		if (block.already_found && ignore_cycles) continue;
-		blocks[1 + x_pos[i]][1 + y_pos[i]] = block;
-	}
-	
-	last_neighbours = blocks;
-	return blocks;
-}
-
-private func GetNeighbours(bool ignore_cycles)
-{
-	var blocks = [];
-	var x_pos = [-1, +1, 0, 0];
-	var y_pos = [0, 0, -1, +1];
-	for (var i = 0; i < 4; ++i)
-	{
-		var block = FindObject(Find_AtPoint(x_pos[i] * build_grid_x, y_pos[i] * build_grid_y), Find_Property("IsConveyorBuildingTile"), Find_Category(C4D_StaticBack));
-		if (!block) continue;
-		if (block.already_found && ignore_cycles) continue;
-		PushBack(blocks, block);
-	}
-	return blocks;
-}
-
-private func IsNeighbour(object other)
-{
-	return other->GetID() == GetID() && ObjectDistance(other) <= Distance(0, 0, build_grid_x, build_grid_y);
 }
 
 private func CheckObjects()

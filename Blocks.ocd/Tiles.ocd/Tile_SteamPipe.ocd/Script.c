@@ -12,8 +12,6 @@ local Description = "$Description$";
 local Collectible = 1;
 local Plane = 14;
 
-local tile_mode = TILE_MODE_LINE;
-
 local IsSteamPipeBuildingTile = true;
 local TileKindPropertyName = "IsSteamPipeBuildingTile";
 
@@ -139,16 +137,21 @@ private func CheckSteam()
 	if (steam_level <= 0) return;
 	
 	var min_steam_neighbour = nil;
-	for (var neighbour in [neighbours.left, neighbours.right, neighbours.up, neighbours.bottom])
+	var min_steam_level = 0;
+	for (var neighbour in neighbours_as_list)
 	{
 		if (!neighbour) continue;
-		if (!min_steam_neighbour || neighbour.steam_level < min_steam_neighbour.steam_level)
+		var neighbour_steam_level = neighbour.steam_level;
+		if (!min_steam_neighbour || neighbour_steam_level < min_steam_level)
+		{
 			min_steam_neighbour = neighbour;
+			min_steam_level = neighbour_steam_level;
+		}
 	}
 	
 	var change = 0;
 	if (min_steam_neighbour)
-		change = (steam_level - min_steam_neighbour.steam_level) / 2;
+		change = (steam_level - min_steam_level) / 2;
 		
 	if (!(change > 0))
 	{
@@ -158,7 +161,7 @@ private func CheckSteam()
 			CreateParticle("Dust", PV_Random(open_offset_x - 5, open_offset_x + 5), PV_Random(open_offset_y - 5, open_offset_y + 5), 0, 0, PV_Random(10, 200), this.steam_particles, 10 * loss);
 			DoSteam(-loss);
 			if (!Random(3))
-				Sound("Liquids::Sizzle", {pitch = 5 + Random(20), volume = 20});
+				Sound("Liquids::Sizzle", {pitch = 5 + Random(5), volume = 5});
 		}
 		else
 		{
