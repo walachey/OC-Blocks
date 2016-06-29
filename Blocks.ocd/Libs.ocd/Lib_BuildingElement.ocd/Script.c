@@ -103,6 +103,11 @@ public func ControlUseStop(object clonk, int x, int y)
 			flag = true;
 			preview_objects[i] = nil;
 			preview_object->RemoveObject();
+			if (this.count <= 1)
+			{
+				flag = false;
+				break;
+			}
 		}
 		
 		if (!flag)

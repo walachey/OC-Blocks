@@ -44,10 +44,11 @@ func BuildingCondition()
 	if ((GBackSolid(-(tile_size_x), 0) || GBackSolid(tile_size_x, 0) || GBackSolid(0, (tile_size_y)) || GBackSolid(0,-(tile_size_y))))
 		return true;
 	
-	if (FindObject(Find_Exclude(this), Find_Not(Find_Func("IsPreview")), Find_Func("IsSolidBuildingTile"), Find_Or(Find_OnLine(-tile_size_x/2-1, 0, tile_size_x/2+1, 0), Find_OnLine(0, -tile_size_y/2-1, 0, tile_size_y/2+2))))
+	if (FindObject(Find_Or(Find_OnLine(-tile_size_x/2-1, 0, tile_size_x/2+1, 0), Find_OnLine(0, -tile_size_y/2-1, 0, tile_size_y/2+2)), 
+		Find_Exclude(this), Find_NoContainer(), Find_Not(Find_Func("IsPreview")), Find_Func("IsSolidBuildingTile")))
 		return true;
 	
-	if (FindObject(Find_AtPoint(0, tile_size_y), Find_Func("IsPillarBuildingTile")))
+	if (FindObject(Find_AtPoint(0, tile_size_y), Find_NoContainer(), Find_Not(Find_Func("IsPreview")), Find_Func("IsPillarBuildingTile")))
 		return true;
 	
 	return false;
