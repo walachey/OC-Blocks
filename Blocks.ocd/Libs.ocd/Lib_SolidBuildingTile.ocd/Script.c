@@ -17,10 +17,13 @@ local HitPoints = 50;
 
 func IsSolidBuildingTile() { return true; }
 
+local AutoFillWallDefinition = nil;
+
 func Constructed()
 {
 	SetSolidMask(0,0,tile_size_x,tile_size_y);
 	AdjustSurroundingMaterial(true, true, true, true);
+	CheckAutoFillWall();
 	return _inherited();
 }
 
@@ -68,6 +71,7 @@ func SpecialPreviewCondition()
 
 func Destruct()
 {
+	is_constructed = false;
 	SetSolidMask();
 	_inherited();
 	OnBecomeUnstable();
@@ -75,6 +79,7 @@ func Destruct()
 
 private func Destroy()
 {
+	is_constructed = false;
 	SetCategory(C4D_None);
 	SetSolidMask();
 	OnBecomeUnstable();
@@ -94,10 +99,15 @@ private func Destroy()
 
 public func OnBecomeUnstable()
 {
+	// Possibly kill walls.
+	for (var neighbour in GetNeighbours(nil, true))
+		if (neighbour) neighbour->CheckSupport();
+	// Remove a supported pillar.
 	var pillar = FindObject(Find_AtPoint(0, -build_grid_y), Find_Category(C4D_StaticBack), Find_Func("IsPillarBuildingTile"));
 	if (pillar) pillar->Destroy();
-	
+	// And then make the neighbours check their stability.
 	if (this && this.no_propagation) return;
+	if (!this) return;
 	for (var neighbour in GetNeighbours())
 		if (neighbour) neighbour->CheckSupport();
 }
@@ -207,14 +217,17 @@ public func Damage(int change, int cause, int cause_plr)
 		UpdateDamageDisplay();
 }
 
-private func GetNeighbours(bool ignore_cycles)
+private func GetNeighbours(bool ignore_cycles, bool find_wall_previews)
 {
+	var check_func = "IsSolidBuildingTile";
+	if (find_wall_previews)
+		check_func = "IsWallBuildingTile";
 	var blocks = [];
 	var x_pos = [-1, +1, 0, 0];
 	var y_pos = [0, 0, -1, 1];
 	for (var i = 0; i < 4; ++i)
 	{
-		var block = FindObject(Find_AtPoint(x_pos[i] * build_grid_x, y_pos[i] * build_grid_y), Find_Func("IsSolidBuildingTile"), Find_Category(C4D_StaticBack));
+		var block = FindObject(Find_AtPoint(x_pos[i] * build_grid_x, y_pos[i] * build_grid_y), Find_Property("is_constructed"), Find_Func(check_func));
 		if (!block) continue;
 		if (block.already_found && ignore_cycles) continue;
 		PushBack(blocks, block);
@@ -234,4 +247,47 @@ private func UpdateDamageDisplay()
 		Attach = ATTACH_Front | ATTACH_MoveRelative
 	};
 	CreateParticle("Fire", PV_Random(-4, 4), PV_Random(-4, 4), 0, 0, 0, particles, 3 * GetDamage() / 2);
+}
+
+private func CheckAutoFillWall()
+{
+	if (!AutoFillWallDefinition) return;
+	
+	for (var direction = -1; direction <= +1; direction += 2)
+	{
+		var offset_y = 0;
+		var valid = false;
+		do
+		{
+			offset_y += direction * build_grid_y;
+			var absolute_y = GetY() + offset_y;
+			if (absolute_y < 0 || absolute_y >= LandscapeHeight()) break;
+			
+			if (FindObject(Find_AtPoint(0, offset_y), Find_ID(GetID()), Find_Property("is_constructed")))
+			{
+				valid = true;
+				break;
+			}
+			
+			if (GBackSolid(0, offset_y)) break;
+		} while (true);
+		
+		if (!valid) continue;
+		
+		var y = 0;
+		while (y != offset_y)
+		{
+			y += direction * build_grid_y;
+			var wall = CreateObject(AutoFillWallDefinition, 0, y, GetOwner());
+			wall->PreviewMode();
+			if (!wall->BuildingCondition())
+			{
+				wall->RemoveObject();
+				continue;
+			}
+			wall->RemoveObject();
+			wall = CreateObject(AutoFillWallDefinition, 0, y, GetOwner());
+			wall->Constructed();
+		}
+	}
 }

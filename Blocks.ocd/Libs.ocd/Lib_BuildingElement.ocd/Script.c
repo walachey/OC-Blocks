@@ -21,6 +21,9 @@ local preview_objects;
 local preview_width;
 local preview_height;
 
+// Whether the element is locked in place (and NOT a preview and NOT loose).
+local is_constructed = false;
+
 static const TILE_MODE_SINGLE = 1;
 static const TILE_MODE_LINE = 2;
 static const TILE_MODE_VERTICAL_LINE = 3;
@@ -88,16 +91,18 @@ public func ControlUseStop(object clonk, int x, int y)
 	while (true)
 	{
 		var flag = false;
-	
-		for (var preview_object in preview_objects)
+		var len = GetLength(preview_objects);
+		for (var i = 0; i < len; ++i)
 		{
+			var preview_object = preview_objects[i];
 			if (!preview_object) continue;
 			if (!preview_object->BuildingCondition()) continue;
 			var obj = this->TakeObject();
 			obj->SetPosition(preview_object->GetX(), preview_object->GetY());
 			obj->Constructed();
-			obj.Collectible = 0;
 			flag = true;
+			preview_objects[i] = nil;
+			preview_object->RemoveObject();
 		}
 		
 		if (!flag)
@@ -292,16 +297,20 @@ func FxRemovePreviewStop()
 
 func Constructed()
 {
+	is_constructed = true;
+	this.Collectible = false;
 	return true;
 }
 
 func Destruct()
 {
+	is_constructed = false;
 	return true;
 }
 
 func Destroy()
 {
+	is_constructed = false;
 	return true;
 }
 

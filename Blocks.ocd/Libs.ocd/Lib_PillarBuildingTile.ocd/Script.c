@@ -69,10 +69,13 @@ public func OnBecomeUnstable()
 {
 	if (this && this.no_propagation) return;
 	
-	var position_y = -build_grid_y;
+	var position_y = 0;
 	while (true)
 	{
-		var tile = FindObject(Find_AtPoint(0, position_y), Find_Category(C4D_StaticBack), Find_Func("IsPillarBuildingTile"));
+		var tile = FindObject(Find_AtPoint(0, position_y), Find_Property("is_constructed"), Find_Property("IsPipeBuildingTile"));
+		if (tile) tile->CheckSupport();
+		
+		tile = FindObject(Find_AtPoint(0, position_y), Find_Property("is_constructed"), Find_Exclude(this), Find_Func("IsPillarBuildingTile"));
 		if (tile)
 		{
 			tile.no_propagation = true;
@@ -80,9 +83,10 @@ public func OnBecomeUnstable()
 		}
 		else
 		{
-			tile = FindObject(Find_AtPoint(0, position_y), Find_Category(C4D_StaticBack), Find_Func("IsSolidBuildingTile"));
-			if (tile) tile->OnBecomeUnstable();
-			break;
+			tile = FindObject(Find_AtPoint(0, position_y), Find_Property("is_constructed"), Find_Func("IsSolidBuildingTile"));
+			if (tile) tile->CheckSupport();
+			if (position_y != 0)
+				break;
 		}
 		position_y -= build_grid_y;
 	}
