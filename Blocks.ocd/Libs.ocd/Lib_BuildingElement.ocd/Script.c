@@ -21,6 +21,9 @@ local preview_objects;
 local preview_width;
 local preview_height;
 
+// Whether the element is locked in place (and NOT a preview and NOT loose).
+local is_constructed = false;
+
 static const TILE_MODE_SINGLE = 1;
 static const TILE_MODE_LINE = 2;
 static const TILE_MODE_VERTICAL_LINE = 3;
@@ -290,16 +293,19 @@ func FxRemovePreviewStop()
 
 func Constructed()
 {
+	is_constructed = true;
 	return true;
 }
 
 func Destruct()
 {
+	is_constructed = false;
 	return true;
 }
 
 func Destroy()
 {
+	is_constructed = false;
 	return true;
 }
 
