@@ -71,6 +71,7 @@ func SpecialPreviewCondition()
 
 func Destruct()
 {
+	is_constructed = false;
 	SetSolidMask();
 	_inherited();
 	OnBecomeUnstable();
@@ -78,6 +79,7 @@ func Destruct()
 
 private func Destroy()
 {
+	is_constructed = false;
 	SetCategory(C4D_None);
 	SetSolidMask();
 	OnBecomeUnstable();
@@ -97,9 +99,13 @@ private func Destroy()
 
 public func OnBecomeUnstable()
 {
+	// Possibly kill walls.
+	for (var neighbour in GetNeighbours(nil, true))
+		if (neighbour) neighbour->CheckSupport();
+	// Remove a supported pillar.
 	var pillar = FindObject(Find_AtPoint(0, -build_grid_y), Find_Category(C4D_StaticBack), Find_Func("IsPillarBuildingTile"));
 	if (pillar) pillar->Destroy();
-	
+	// And then make the neighbours check their stability.
 	if (this && this.no_propagation) return;
 	if (!this) return;
 	for (var neighbour in GetNeighbours())
@@ -211,14 +217,17 @@ public func Damage(int change, int cause, int cause_plr)
 		UpdateDamageDisplay();
 }
 
-private func GetNeighbours(bool ignore_cycles)
+private func GetNeighbours(bool ignore_cycles, bool find_wall_previews)
 {
+	var check_func = "IsSolidBuildingTile";
+	if (find_wall_previews)
+		check_func = "IsWallBuildingTile";
 	var blocks = [];
 	var x_pos = [-1, +1, 0, 0];
 	var y_pos = [0, 0, -1, 1];
 	for (var i = 0; i < 4; ++i)
 	{
-		var block = FindObject(Find_AtPoint(x_pos[i] * build_grid_x, y_pos[i] * build_grid_y), Find_Func("IsSolidBuildingTile"), Find_Category(C4D_StaticBack));
+		var block = FindObject(Find_AtPoint(x_pos[i] * build_grid_x, y_pos[i] * build_grid_y), Find_Property("is_constructed"), Find_Func(check_func));
 		if (!block) continue;
 		if (block.already_found && ignore_cycles) continue;
 		PushBack(blocks, block);
