@@ -21,10 +21,18 @@ local AutoFillWallDefinition = nil;
 
 func Constructed()
 {
+	is_constructed = true;
 	SetSolidMask(0,0,tile_size_x,tile_size_y);
 	AdjustSurroundingMaterial(true, true, true, true);
 	CheckAutoFillWall();
+	CheckPlatforms();
 	return _inherited();
+}
+
+func CheckPlatforms()
+{
+	for (o in FindObjects(Find_Or(Find_AtPoint(-tile_size_x, 0), Find_AtPoint(tile_size_x, 0)), Find_Func("IsPlatformBuildingTile"), Find_NoContainer(), Find_Not(Find_Func("IsPreview"))))
+		o->AdjustSupport();
 }
 
 
@@ -76,6 +84,7 @@ func Destruct()
 	SetSolidMask();
 	_inherited();
 	OnBecomeUnstable();
+	CheckPlatforms();
 }
 
 private func Destroy()
@@ -84,6 +93,7 @@ private func Destroy()
 	SetCategory(C4D_None);
 	SetSolidMask();
 	OnBecomeUnstable();
+	CheckPlatforms();
 	
 	var particles = 
 	{
