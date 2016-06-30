@@ -97,7 +97,11 @@ public func ControlUseStop(object clonk, int x, int y)
 			var preview_object = preview_objects[i];
 			if (!preview_object) continue;
 			if (!preview_object->BuildingCondition()) continue;
-			var obj = this->TakeObject();
+			var obj = this->~TakeObject();
+			
+			if(!obj)
+				obj = this;
+			
 			obj->SetPosition(preview_object->GetX(), preview_object->GetY());
 			obj->Constructed();
 			flag = true;
