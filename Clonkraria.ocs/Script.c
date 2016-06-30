@@ -15,7 +15,7 @@ func InitializePlayer(iPlr)
 	var obj = clonk->CreateObject(Chest, 0, 0, -1);
 	obj->CreateContents(Tile_SolidBrick)->SetStackCount(999);
 	obj->CreateContents(Tile_WallBrick)->SetStackCount(999);
-	obj->CreateContents(Tile_PlattformWood)->SetStackCount(999);
+	obj->CreateContents(Tile_PlatformWood)->SetStackCount(999);
 /*	obj->CreateContents(Tile_SolidWood)->SetStackCount(999);
 	obj->CreateContents(Tile_WallWood)->SetStackCount(999);
 	obj->CreateContents(Tile_SolidMetal)->SetStackCount(999);

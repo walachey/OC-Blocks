@@ -121,7 +121,7 @@ func AdjustSurroundingMaterial(up, down, left, right)
 				if (!GBackSolid(x, y) && mat == nil)
 					break;
 				
-				if (!GBackSolid(x, y))
+				if (!GBackSolid(x, y) && mat != Material("HalfVehicle"))
 					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1);
 				
 				mat = GetMaterial(x,y);
@@ -136,7 +136,7 @@ func AdjustSurroundingMaterial(up, down, left, right)
 				if (!GBackSolid(x, y) && mat == nil)
 					break;
 				
-				if (!GBackSolid(x, y))
+				if (!GBackSolid(x, y) && mat != Material("HalfVehicle"))
 					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1);
 				
 				mat = GetMaterial(x,y);
@@ -155,7 +155,7 @@ func AdjustSurroundingMaterial(up, down, left, right)
 				if (!GBackSolid(x, y) && mat == nil)
 					break;
 				
-				if (!GBackSolid(x, y))
+				if (!GBackSolid(x, y) && mat != Material("HalfVehicle"))
 					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1);
 				
 				mat = GetMaterial(x,y);
@@ -170,7 +170,7 @@ func AdjustSurroundingMaterial(up, down, left, right)
 				if (!GBackSolid(x, y) && mat == nil)
 					break;
 				
-				if (!GBackSolid(x, y))
+				if (!GBackSolid(x, y) && mat != Material("HalfVehicle"))
 					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1);
 				
 				mat = GetMaterial(x,y);

@@ -1,7 +1,7 @@
 [DefCore]
-id=Tile_PlattformWood
-Version=6,0
-Category=C4D_Object
+id=PlatformSupportWood
+Version=5,2,0,1
+Category=C4D_StaticBack
 Width=10
 Height=10
 Offset=-5,-5
