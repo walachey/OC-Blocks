@@ -103,7 +103,7 @@ private func Destroy()
 		ForceY = PV_Gravity(100),
 		CollisionVertex = 0
 	};
-	CreateParticle("SmokeDirty", PV_Random(-build_grid_x, +build_grid_x), PV_Random(-build_grid_y, +build_grid_y), PV_Random(-10, 10), PV_Random(-10, 10), PV_Random(10, 60), particles, 50);
+	CreateParticle("SmokeDirty", PV_Random(-build_grid_x/2, +build_grid_x/2), PV_Random(-build_grid_y/2, +build_grid_y/2), PV_Random(-10, 10), PV_Random(-10, 10), PV_Random(10, 60), particles, 50);
 	Sound("Hits::Materials::Rock::Rockfall*");
 	RemoveObject();
 } 
