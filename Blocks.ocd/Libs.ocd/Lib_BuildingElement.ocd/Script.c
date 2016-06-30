@@ -8,6 +8,8 @@
 local Name = "$Name$";
 local Description = "$Description$";
 
+local can_be_colored = true;
+
 local build_offset_x = 0;
 local build_offset_y = 0;
 

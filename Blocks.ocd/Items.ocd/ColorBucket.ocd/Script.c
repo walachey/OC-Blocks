@@ -35,21 +35,25 @@ public func ControlUse(object clonk, int iX, int iY)
 	if(!color)
 		return;
 	
-	for (var o in FindObjects(Find_Func("IsBuildingTile"), Find_Property("is_constructed"), Find_AtPoint(clonk->GetX() + iX - GetX(), clonk->GetY() + iY - GetY())))
+	var p = 0;
+	var obj = nil;
+	
+	for (var o in FindObjects(Find_AtPoint(clonk->GetX() + iX - GetX(), clonk->GetY() + iY - GetY()), 
+	Find_Or(Find_Func("IsSolidBuildingTile"), Find_Func("IsWallBuildingTile")), Find_Property("can_be_colored"), Find_Property("is_constructed")))
 	{
-		o->SetClrModulation(color);
+		if (o.Plane > p)
+		{
+			obj = o;
+			p = o.Plane;
+		}
 	}
+	
+	if (obj)
+		obj->SetClrModulation(color);
 
 	return true;
 }
 
-public func RejectCollect(id def, object obj)
-{
-	if (!obj->~IsBucketMaterial()) return true;
-	// Can only contain one stackable object.
-	if (Contents() && Contents(0)->~IsStackable()) return true;
-	return false;
-}
 
 
 protected func Hit()
