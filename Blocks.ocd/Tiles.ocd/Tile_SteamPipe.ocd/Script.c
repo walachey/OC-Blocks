@@ -150,7 +150,7 @@ private func CheckSteam()
 	
 	var change = 0;
 	if (min_steam_neighbour)
-		change = (steam_level - min_steam_level) / 2;
+		change = 3 * (steam_level - min_steam_level) / 4;
 		
 	if (!(change > 0))
 	{
