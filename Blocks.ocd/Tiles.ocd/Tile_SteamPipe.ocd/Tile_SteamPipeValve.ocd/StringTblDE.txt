@@ -1,0 +1,2 @@
+Name=Druckventil
+Description=Kann an Dampfrohre platziert werden und gibt den Weg nur frei, wenn zu viel Druck vorhanden ist.

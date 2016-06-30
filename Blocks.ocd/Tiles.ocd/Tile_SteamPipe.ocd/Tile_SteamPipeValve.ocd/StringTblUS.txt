@@ -1,0 +1,2 @@
+Name=Pressure Valve
+Description=Can be attached to steam pipes and blocks the way unless there is excess pressure.

@@ -22,13 +22,15 @@ local open_offset_y;
 
 local steam_particles;
 
+local pressure_valve;
+
 public func Definition()
 {
 	this.steam_particles = new Particles_Smoke()
 	{
 		Size = PV_Linear(0, PV_Random(20, 50)),
 		ForceX = PV_Random(-5, 5, 10),
-		ForceY = PV_Random(-5, 5, 10),
+		ForceY = PV_Random(-5, 1, 10),
 		R = 255, G = 255, B = 255, 
 		Alpha = PV_Linear(16, 0),
 		Rotation = PV_Random(360)
@@ -95,8 +97,16 @@ public func Destruct()
 {
 	RemoveTimer("CheckSteam");
 	RemoveTimer("CheckBurningObjects");
-	
+	if (pressure_valve)
+		pressure_valve->Destruct();
 	return inherited(...);
+}
+
+public func Destroy()
+{
+	if (pressure_valve)
+		pressure_valve->RemoveObject();
+	return inherited();
 }
 
 private func CheckBurningObjects()
@@ -114,6 +124,16 @@ private func CheckBurningObjects()
 private func CheckSteam()
 {
 	if (steam_level <= 0) return;
+	
+	if (pressure_valve)
+	{
+		if (!pressure_valve.is_open)
+		{
+			if (steam_level > 150)
+				pressure_valve->Animate();
+			return;
+		}
+	}
 	
 	var min_steam_neighbour = nil;
 	var min_steam_level = 0;
