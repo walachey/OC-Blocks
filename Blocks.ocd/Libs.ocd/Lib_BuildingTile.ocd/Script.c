@@ -122,7 +122,7 @@ func AdjustSurroundingMaterial(up, down, left, right)
 					break;
 				
 				if (!GBackSolid(x, y) && mat != Material("HalfVehicle"))
-					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1);
+					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1, DMQ_Sub);
 				
 				mat = GetMaterial(x,y);
 			}
@@ -137,7 +137,7 @@ func AdjustSurroundingMaterial(up, down, left, right)
 					break;
 				
 				if (!GBackSolid(x, y) && mat != Material("HalfVehicle"))
-					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1);
+					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1, DMQ_Sub);
 				
 				mat = GetMaterial(x,y);
 			}
@@ -156,7 +156,7 @@ func AdjustSurroundingMaterial(up, down, left, right)
 					break;
 				
 				if (!GBackSolid(x, y) && mat != Material("HalfVehicle"))
-					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1);
+					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1, DMQ_Sub);
 				
 				mat = GetMaterial(x,y);
 			}
@@ -171,7 +171,7 @@ func AdjustSurroundingMaterial(up, down, left, right)
 					break;
 				
 				if (!GBackSolid(x, y) && mat != Material("HalfVehicle"))
-					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1);
+					DrawMaterialQuad(MaterialName(mat), GetX() + x, GetY() + y, GetX() + x + 1, GetY() + y, GetX() + x + 1, GetY() + y + 1, GetX() + x, GetY() + y + 1, DMQ_Sub);
 				
 				mat = GetMaterial(x,y);
 			}
