@@ -330,7 +330,7 @@ func BuildingCondition()
 	return true;
 }
 
-func PreviewBuildingCondition(callers)
+func PreviewBuildingCondition()
 {
 	return BuildingCondition();
 }

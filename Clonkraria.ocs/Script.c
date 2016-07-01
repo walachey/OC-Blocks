@@ -20,10 +20,7 @@ func InitializePlayer(iPlr)
 	obj->CreateContents(Tile_WallWood)->SetStackCount(999);
 	obj->CreateContents(Tile_SolidMetal)->SetStackCount(999);
 	obj->CreateContents(Tile_WallMetal)->SetStackCount(999);*/
-	obj->CreateContents(ColorBucket)->SetColor(HSL(42, 255, 128));
-	obj->CreateContents(ColorBucket)->SetColor(RGB(50, 50, 50));
-	obj->CreateContents(ColorBucket)->SetColor(HSL(212, 255, 128));
-	obj->CreateContents(ColorBucket)->SetColor(RGB(255,255,255));
+	obj->CreateContents(ColorBucket);
 	obj->CreateContents(Tile_PillarWood)->SetStackCount(999);
 	obj->CreateContents(Tile_Conveyor)->SetStackCount(999);
 	obj->CreateContents(Tile_SteamPipe)->SetStackCount(999);
