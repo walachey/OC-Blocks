@@ -40,7 +40,9 @@ public func ControlUseStart(object clonk, int x, int y)
 public func ControlUseHolding(object clonk, int x, int y)
 {
 	dummy->ClearParticles();
-	dummy->DrawParticleLine("Flash", starting_point_x, starting_point_y, clonk->GetX() + x, clonk->GetY() + y, 1, 0, 0, 1, particle);
+	var tx = clonk->GetX() + x;
+	var ty = clonk->GetY() + y;
+	dummy->DrawParticleLine("Flash", starting_point_x, starting_point_y, tx + (tx-starting_point_x), ty + (ty - starting_point_y), 1, 0, 0, 1, particle);
 	//DrawParticleLine("Flash", starting_point_x - GetX(), starting_point_y - GetY(), clonk->GetX() + x - GetX(), clonk->GetY() + y - GetY(), 1, 0, 0, 1, particle);
 	return true;
 }
@@ -150,16 +152,21 @@ public func ControlThrow(clonk, x, y)
 	for(var c in clrs)
 		GuiAddSubwindow(c, menu.items);
 	
-	var mid = GuiOpen(menu);
-	//clonk->SetMenu(mid, true);
-	clonk.color_bucket_menu_id = mid;
+	if(!clonk.color_bucket_menu_id)
+	{
+		var mid = GuiOpen(menu);
+		clonk.color_bucket_menu_id = mid;
+	}
 	return true;
 }
 
 public func SetDrawingColor(array props)
 {
 	if(props[0])
+	{
 		GuiClose(props[0].color_bucket_menu_id);
+		props[0].color_bucket_menu_id = nil;
+	}
 	
 	color = props[1];
 	SetClrModulation(color);
