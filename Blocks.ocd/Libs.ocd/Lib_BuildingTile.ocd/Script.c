@@ -14,8 +14,8 @@ func InitialStackCount() { return 4; }
 local Name = "$Name$";
 local Description = "$Description$";
 
-local tile_size_x = 10;
-local tile_size_y = 10;
+local tile_size_x = 5;
+local tile_size_y = 5;
 
 func IsBuildingTile() { return true; }
 func CanBeHitByPickaxe() { if (GetCategory() == C4D_StaticBack) return true; return false; }

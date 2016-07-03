@@ -2,9 +2,9 @@
 id=Tile_PillarWood
 Version=5,2,0,1
 Category=C4D_Object
-Width=10
-Height=10
-Offset=-5,-5
+Width=5
+Height=5
+Offset=-2,-2
 Vertices=3
 VertexX=0,3,-3
 VertexY=2,-2,-2
